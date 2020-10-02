@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<div id="test">你在开玩笑吗</div>
+<div id="demo">
+
+    <li>test1</li>
+    <li>test2</li>
+    <li>test3</li>
+  </ul>
+</div>
+
+<script>
+  const arr = [1,2,3,4,5,6,7]
+  const obj1 = {a:1, b:2, c:3, d:4, e:5, f:6}
+
+
+  // 1、[].slice.call(lis)：将为数组转换为真数组
+  // slice(star,end)，从上star开始向后截取到end下标之前
+  // 参数都是下标，返回的是数组
+  // lis伪数组/类数组 getElementsByTagName返回一个伪数组没有forEach方法
+  // document.querySelectorAll()返回的（伪数组）对象自带一个forEach方法
+  // forEach是数组的方法
+  const  lis = document.getElementsByTagName('li')
+  //  lis2是数组 Array.from() 方法从一个类似数组或可迭代对象创建一个新的，浅拷贝的数组实例。
+  const lis2 = Array.from(lis)
+  // 方法的属性值是函数，此处直接获取slice函数，让lis对象调用slice函数
+  // 因为伪数组lis也有length和index特性，而slice内部实现也需要这两个特性，所以为数组可以使用slice函数方法
+  // fn.bind(obj)返回一个新函数，执行新函数就会执行原来的函数，且this是第一个参数
+  const lis3 = Array.prototype.slice.call(lis)
+
+
+  // 2、node.nodeType：得到类型节点
+  //  <div id="test">你在开玩笑吗</div>
+  const elementNode = document.getElementById('test')
+
+
+  // 属性值可以重复，但是属性名不能重复。
+  // 通过elementNode元素的id属性名取到，elementNode的属性值节点
+  const attrNode = elementNode.getAttributeNode('id')
+  // 取到文本节点
+  const textNode = elementNode.firstChild
+  // 通过nodeType取到了节点类型的对应的值
+  // console.log(elementNode.nodeType, attrNode.nodeType, textNode.nodeType) // 1 2 3
+
+
+  // 3、Object.defineProperty(obj, propertyName, {})：给对象添加属性（指定描述符）
+  const p ={
+    firstName: 'A',
+    lastName: 'B'
+  }
+
+  // 属性名都是字符串类型
+  //  参数： 1、要定属性所在的对象   2、属性名（字符串格式）  3、属性描述
+  Object.defineProperty(p, 'fullName', {  //  属性描述符
+    // 数据描述符
+    configurable: false,   // 是否可以重新define（定义）
+    enumerable: false,     // 是否可以枚举（是否可以被遍历查询到）
+    // value: 'A-B',            // 指定初始值
+    // writable: false ,        // value是否可以修改
+
+    // 存取描述
+    get() {
+      return this.firstName + '-' + this.lastName
+    },
+    set(v) {
+      const names = v.split('-')
+      this.firstName = names[0]
+      this.lastName = names[1]
+    }
+  })
+
+  console.log(p.fullName)
+  p.fullName = 'C-D'
+  console.log(p.fullName, p.firstName, p.lastName)
+  p.firstName = 'E'
+  p.lastName = 'F'
+  console.log(p.fullName)
+
+  //  修改firstName的默认可枚举属性
+  Object.defineProperty(p, 'firstName', {
+    enumerable:false
+  })
+
+
+  // 4、Object.keys(obj)：得到对象（自身，不管原型链上的）可枚举属性组成的数组
+  const names = Object.keys(p)
+
+  // 因为上面的fullName被设置成了不可枚举，
+  // 平时的属性默认都是可枚举的，所以结果是["lastName"]
+  console.log(names)
+
+  // 5、obj.hasOwnProperty(prop)：判断prop（属性）是否是obj（对象）自身的属性
+  // toString是一个方法，但是不是p对象自身的方法，而是Object对象的原型链上的方法，所以是false
+  console.log(p.hasOwnProperty('firstName'), p.hasOwnProperty('toString'))
+
+  // 6、DocumentFragment：文档碎片接口，表示一个没有父级文件的最小文档对象。（高效批量更新多个节点）
+  // 一个document对应一个文件，加载一个html文件就生成一个document文档
+  // DocumentFragment：是只存在于内存中的
+  // （节点容器，这个容器无法放到页面上，但是里边的节点可以放到页面上，包括自己创建的fragment节点）
+  // （可以放很多个节点）
+  // 无法将它（DocumentFragment）放到页面中
+  const div = document.getElementById('demo')
+
+  // 创建空容器
+  // DocumentFragment是节点Node的一个子类型，所以创建出来的fragment是一个节点类型
+  const fragment = document.createDocumentFragment()
+  let child
+
+  // 一个节点只能有一个父节点
+  // 将div下的所有子node转义到fragment中
+  while (child=div.firstChild){
+    fragment.appendChild(child)
+  }
+
+  // 处理fragment中所有li
+  // fragment.children获取到fragment节点中所有（子标签）组成的伪数组
+  // fragment.childNode获取到fragment节点中所有（子节点）组成的伪数组
+  Array.from(fragment.children[0].children).forEach(li => {
+    li.innerHTML = '你好帅！' //不更新页面
+  })
+
+  // 将处理好的fragment添加到div中
+  // appendChild接收的参数是节点类型
+  // DocumentFragment是节点Node的一个子类型，所以创建出来的fragment是一个节点类型
+  div.appendChild(fragment) //  进行了批量更新
+
+  /*
+    div共有3个（子节点），两个文本节点（换行文本），一个元素节点（ul）
+    一个子标签（ul）
+    <div id="demo">
+      <ul>
+        <li>test1</li>
+        <li>test2</li>
+        <li>test3</li>
+      </ul>
+    </div>
+  */
+</script>
+</body>
+</html>

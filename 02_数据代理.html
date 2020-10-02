@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style></style>
+</head>
+<body>
+<div id="app"></div>
+<script src="./js/compile.js"></script>
+<script src="./js/mvvm.js"></script>    //  bug1:根实例对象的data不能是函数
+<script src="./js/observer.js"></script>
+<script src="./js/watcher.js"></script>
+<!--
+  1、vue数据代理：data对象的所有属性的操作（读/写）有vm对象代理操作
+  2、好处：通过vm对象就可以方便的操作data中的数据
+  3、实现：
+      A、通过Object.defineProperty(vm, key, {})给vm对象添加与data对象属性对应的属性
+      B、所有添加的属性都包含get/set方法
+      C、在get/set方法中去操作data中对应的属性
+-->
+<script>
+  var vm = new MVVM({
+    el : '#app',
+    data:{
+      name:'laosha111'
+    }
+  });
+
+
+  console.log(vm.name, vm._data.name);  //  代理读取  getter
+  vm.name = 'feifei22'                    //  代理写入  setter
+  console.log(vm._data.name);
+</script>
+</body>
+</html>
+

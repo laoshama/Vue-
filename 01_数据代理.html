@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <style></style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="./js/vue.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  var vm = new Vue({
+    el : '#app',
+    data(){
+      return {
+        name:'laosha'
+    };
+  }
+ });
+
+
+  console.log(vm.name, vm._data.name);  //  代理读取  getter
+  vm.name = 'feifei'                    //  代理写入  setter
+  console.log(vm._data.name);
+
+  /*
+    代理对象： vm
+    被代理对象：  data
+    通过代理对象操作被代理对象中的属性数据
+  */
+</script>
+</body>
+</html>
+
